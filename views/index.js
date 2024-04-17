@@ -2,84 +2,73 @@ const form = document.querySelector("form");
 const ul = document.querySelector("ul");
 
 form.addEventListener("submit", (e) => {
-    e.preventDefault();
+  e.preventDefault();
   const item = e.target.item.value;
   const description = e.target.description.value;
   const price = e.target.price.value;
-  const category = e.target.category.value;
+  const quantity = e.target.quantity.value;
 
-  const expenseDetails = {
-    amount: amount,
+  const itemDetails = {
+    item: item,
     description: description,
-    category: category,
+    price: price,
+    quantity: quantity
   };
 
   axios
-    .post("http://localhost:3000/expense/add-expense", expenseDetails)
+    .post("http://localhost:3000/dashboard/add-items", itemDetails)
     .then((res) => {
-      const id = res.data.id;
-      const li = document.createElement("li");
-      li.id = id;
-      const buttonHTML = `
-                <button type="button" class="btn btn-success edit-btn" style="margin-left:auto; margin-right:5px;">Edit</button>
-                <button type="button" class="btn btn-danger delete-btn">Delete</button>
-                `;
-      li.innerHTML = `${amount}-${description}-${category} ${buttonHTML}`;
-      li.classList.add("list-group-item");
-      li.classList.add("d-flex");
-      li.classList.add("justify-content-between");
-      li.classList.add("align-items-center");
-
-      ul.appendChild(li);
+      window.location.reload();
     })
     .catch((err) => console.log(err));
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   axios
-    .get("http://localhost:3000/expense/get-expense")
+    .get("http://localhost:3000/dashboard/get-items")
     .then((result) => {
-      result.data.forEach((expense) => {
-        const amount = expense.amount;
-        const description = expense.description;
-        const category = expense.category;
+      result.data.forEach((res) => {
+        const item = res.item;
+        const description = res.description;
+        const price = res.price;
+        const quantity = res.quantity;
         const li = document.createElement("li");
-        li.id = expense.id;
+        li.id = res.id;
         const buttonHTML = `
-                <button type="button" class="btn btn-success edit-btn" style="margin-left:auto; margin-right:5px;">Edit</button>
-                <button type="button" class="btn btn-danger delete-btn">Delete</button>
+                <button type="button" class="btn btn-success" id="one" style="margin-left:auto; margin-right:5px;">Buy One</button>
+                <button type="button" class="btn btn-warning" id="two"> Buy Two </button>
+                <button type="button" class="btn btn-danger" id="three"> Buy Three </button>
                 `;
-        li.innerHTML = `${amount} - ${description} - ${category} ${buttonHTML}`;
+        li.innerHTML = `${item} - ${description} - ${price} - ${quantity}   ${buttonHTML}`;
         li.classList.add("list-group-item");
         li.classList.add("d-flex");
         li.classList.add("justify-content-between");
         li.classList.add("align-items-center");
         ul.appendChild(li);
-        const editBtn = li.querySelector(".edit-btn");
-        const deleteBtn = li.querySelector(".delete-btn");
-        editBtn.addEventListener("click", () => {
-          axios
-            .delete(
-              `http://localhost/expense/delete-expense/${editBtn.parentElement.id}`
-            )
+        const buyOne = li.querySelector("#one");
+        const buyTwo = li.querySelector("#two");
+        const buyThree = li.querySelector("#three");
+        buyOne.addEventListener("click", () => {
+          axios.post(`http://localhost:3000/dashboard/buy-items/${res.id}?type=${buyOne.id}`)
             .then((res) => {
-              document.getElementById("amount").value = amount;
-              document.getElementById("description").value = description;
-              document.getElementById("category").value = category;
-              editBtn.parentElement.remove();
+              window.location.reload();
             })
             .catch((err) => console.log(err));
-        });
-        deleteBtn.addEventListener("click", () => {
-          axios
-            .delete(
-              `http://localhost:3000/expense/delete-expense/${deleteBtn.parentElement.id}`
-            )
+        })
+        buyTwo.addEventListener("click", () => {
+          axios.post(`http://localhost:3000/dashboard/buy-items/${res.id}?type=${buyTwo.id}`)
             .then((res) => {
-              deleteBtn.parentElement.remove();
+              window.location.reload();
             })
             .catch((err) => console.log(err));
-        });
+        })
+        buyThree.addEventListener("click", () => {
+          axios.post(`http://localhost:3000/dashboard/buy-items/${res.id}?type=${buyThree.id}`)
+            .then((res) => {
+              window.location.reload();
+            })
+            .catch((err) => console.log(err));
+        })
       });
     })
     .catch((err) => console.log(err));

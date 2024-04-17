@@ -1,4 +1,5 @@
 const Seller = require("../models/seller");
+const Sequelize = require('sequelize');
 
 exports.additem = (req, res) => {
   const { item, description, price, quantity } = req.body;
@@ -27,17 +28,22 @@ exports.getitems = (req, res) => {
     });
 };
 
-exports.deleteitem = (req, res) => {
-  const id = req.params.id;
-  Seller.destroy({ where: { id } })
-    .then((result) => {
-      if (result === 0) {
-        return res.status(404).json({ error: "Item not found" });
-      }
-      res.json({ message: "Item deleted successfully" });
-    })
-    .catch((err) => {
-      console.error("Error deleting item:", err);
-      res.status(500).json({ error: "Error deleting item" });
-    });
+exports.buyitem = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const type = req.query.type;
+    let subtract = 0;
+    if (type == "one") subtract = 1;
+    if (type == "two") subtract = 2;
+    if (type == "three") subtract = 3;
+    const updateQuantity = await Seller.update(
+      { quantity: Sequelize.literal(`quantity - ${subtract}`) },
+      { where: { id } }
+    );
+    res.status(200).json({ message: "Item updated successfully" });
+  }
+  catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "Error deleting item" });
+  }
 };

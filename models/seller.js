@@ -18,9 +18,16 @@ const Seller = sequelize.define("seller", {
   price: {
     type: Sequelize.INTEGER,
     allowNull: false,
+    validate: {
+      min: 0
+    }
   },
   quantity: {
     type: Sequelize.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 0
+    }
   },
 });
 

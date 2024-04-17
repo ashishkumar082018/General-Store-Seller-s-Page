@@ -12,6 +12,7 @@ app.use(cors());
 app.use("/dashboard", sellerRoute);
 
 sequelize
+  //.sync({ force: true })
   .sync()
   .then(() => {
     app.listen(3000, () => {
